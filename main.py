@@ -20,6 +20,7 @@ def daemon_refresh_security_daily():
             end = util.getLastestOpenDate()
 
         if start == end:
+            log.log("start == end, so go to sleep")
             time.sleep(600)
             continue
 
