@@ -7,9 +7,9 @@ import time
 def daemon_refresh_security_daily():
     log.log("Start daemon_refresh_security_daily")
     while True:
-        # if util.getLastestOpenDate() != util.getYMD() or util.getHMS() < "16:00:00" or util.getHMS() > "16:01:00":
-        #     time.sleep(10)
-        #     continue
+        if util.getLastestOpenDate() != util.getYMD() or util.getHMS() < "23:30:00" or util.getHMS() > "23:31:00":
+            time.sleep(10)
+            continue
         log.log("refresh securities daily base data")
         max_date_db = dao.select("select max(date) max_date from t_security_daily", ())[0]['max_date']
         if max_date_db is None:
@@ -43,7 +43,7 @@ def daemon_refresh_security_daily():
                 log.log("Values Len:" + str(values.__len__()) + " Code: " + code + " Date: " + str(date))
                 values.append((code, pre_close, high, close, low, open, date))
                 pre_close = close
-                if values.__len__() == 25000:
+                if values.__len__() == 250000:
                     log.log("saving 2 db ing...")
                     dao.updatemany(
                         "insert into t_security_daily(code, pre_close, high, close, low, open, date) values(%s,%s,%s,%s,%s,%s,%s)",
