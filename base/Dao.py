@@ -1,76 +1,56 @@
 import pymysql.cursors
 
-# Connect to the database 95.163.200.245
-connection = pymysql.connect(host='95.163.200.245',
-                             user='root',
-                             password='queue11235813',
-                             db='security_data',
-                             charset='utf8mb4',
-                             cursorclass=pymysql.cursors.DictCursor)
+host='95.163.200.245'
+user='root'
+password='queue11235813'
+db='security_data'
+charset='utf8mb4'
+cursorclass=pymysql.cursors.DictCursor
 
-# connection = pymysql.connect(host='localhost',
-#                              user='root',
-#                              password='123456',
-#                              db='conceptlistener',
-#                              charset='utf8mb4',
-#                              cursorclass=pymysql.cursors.DictCursor)
+# host='localhost'
+# user='root'
+# password='123456'
+# db='conceptlistener'
+# charset='utf8mb4'
+# cursorclass=pymysql.cursors.DictCursor
+
+def getConn():
+    connection = pymysql.connect(host=host,
+                                 user=user,
+                                 password=password,
+                                 db=db,
+                                 charset=charset,
+                                 cursorclass=cursorclass)
+    return connection
 
 def updatemany(sql, arr_values):
-    cursor = None
+    connection = getConn()
     try:
         with connection.cursor() as cursor:
-            # Create a new record
             cursor.executemany(sql, arr_values)
-        # connection is not autocommit by default. So you must commit to save
-        # your changes.
         connection.commit()
+    except Exception as e:
+        connection.rollback()
     finally:
-        cursor.close()
+        connection.close()
 
 def update(sql, values):
-    cursor = None
+    connection = getConn()
     try:
         with connection.cursor() as cursor:
-            # Create a new record
             cursor.execute(sql, values)
-        # connection is not autocommit by default. So you must commit to save
-        # your changes.
         connection.commit()
+    except Exception as e:
+        connection.rollback()
     finally:
-        cursor.close()
+        connection.close()
 
 def select(sql, values):
-    cursor = None
+    connection = getConn()
     try:
         with connection.cursor() as cursor:
-            # Read a single record
             cursor.execute(sql, values)
             result = cursor.fetchall()
             return result
-
     finally:
-        cursor.close()
-
-def selectmany(sql, arr_values):
-    cursor = None
-    try:
-        with connection.cursor() as cursor:
-            # Read a single record
-            cursor.executemany(sql, arr_values)
-            result = cursor.fetchall()
-            return result
-
-    finally:
-        cursor.close()
-
-
-
-
-
-
-
-
-
-
-
-
+        connection.close()

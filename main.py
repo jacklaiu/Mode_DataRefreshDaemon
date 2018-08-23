@@ -8,7 +8,7 @@ def daemon_refresh_security_daily():
     log.log("Start daemon_refresh_security_daily")
     while True:
         yesterday = util.getPreDayYMD(1, util.getYMD())
-        if util.isOpen(yesterday) is False or util.getHMS() > "00:50:00":
+        if util.isOpen(yesterday) is False or util.getHMS() < "04:50:00" or util.getHMS() > "04:52:00":
             time.sleep(10)
             continue
         log.log("refresh securities daily base data")
@@ -56,6 +56,7 @@ def daemon_refresh_security_daily():
         dao.updatemany(
             "insert into t_security_daily(code, pre_close, high, close, low, open, date) values(%s,%s,%s,%s,%s,%s,%s)",
             values)
+        log.log("saving 2 db finished!")
         time.sleep(60*100)
 
 daemon_refresh_security_daily()
