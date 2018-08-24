@@ -27,6 +27,7 @@ def daemon_refresh_security_daily():
 
         securitys = [item['code'] for item in dao.select("select distinct code from t_security_concept", ())]
         values = []
+        delete_values = []
         for code in securitys:
             df = ts.get_k_data(code, start, end)
             pre_close = None
@@ -45,6 +46,7 @@ def daemon_refresh_security_daily():
                 low = row['low']
                 log.log("Values Len:" + str(values.__len__()) + " Code: " + code + " Date: " + str(date))
                 values.append((code, pre_close, high, close, low, open, date))
+                delete_values.append((code, date))
                 pre_close = close
                 if values.__len__() == 250000:
                     log.log("saving 2 db ing...")
@@ -53,6 +55,7 @@ def daemon_refresh_security_daily():
                         values)
                     values = []
         log.log("saving 2 db ing...")
+        dao.updatemany("delete from t_security_daily where code = %s and date = %s", delete_values)
         dao.updatemany(
             "insert into t_security_daily(code, pre_close, high, close, low, open, date) values(%s,%s,%s,%s,%s,%s,%s)",
             values)
